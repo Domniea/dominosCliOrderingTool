@@ -4,9 +4,10 @@ import { program } from "commander";
 import inquirer from "inquirer";
 
 import {
-  getOrderID,
   delivery,
   createStoreList,
+  getOrderID,
+  getOrderPrice,
   getAuthToken,
   getTokenId,
   orderPizza
@@ -19,7 +20,110 @@ program.version("1.0.0").description("My CLI Domnios App");
 
 // --- Questons For User --- //
 
+const maxToppingsValidation = async (input) => {
+  if (input.length > 10) {
+     return 'TEN TOPPINGS MAX PLEASE';
+  }
+  return true;
+};
+
+
 const questions = [
+  {
+    type: "checkbox",
+    name: "pizzaToppingsAnswer",
+    message: "Welcome to my Dominos Pizza Ordering CLI tool. \nWhat type of toppings would you like on your pizza? \n",
+    choices: [
+      new inquirer.Separator('PROTEINS'),
+      {
+        name: 'Pepperoni',
+        value: ["P", {"1/1": '1'}]
+      },
+      {
+        name: 'Ham',
+        value: ["H", {"1/1": '1'}]
+      },
+      {
+        name: 'Beef',
+        value: ["B", {"1/1": '1'}]
+      },
+      {
+        name: 'Salami',
+        value: ["Sa", {"1/1": '1'}]
+      },
+      {
+        name: 'Sausage',
+        value: ["S", {"1/1": '1'}]
+      },
+      {
+        name: 'Chicken',
+        value: ["Du", {"1/1": '1'}]
+      },
+      {
+        name: 'Bacon',
+        value: ["K", {"1/1": '1'}]
+      },
+      {
+        name: 'Philly Meat',
+        value: ["Pm", {"1/1": '1'}]
+      },
+      new inquirer.Separator('VEGGIES'),
+      {
+        name: 'Jalapeno Peppers',
+        value: ["J", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Onions',
+        value: ["O", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Banana Peppers',
+        value: ["Z", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Tomtoes',
+        value: ["Td", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Olives',
+        value: ["R", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Mushrooms',
+        value: ["M", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Pinapple',
+        value: ["N", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Shreded Provolone',
+        value: ["Cp", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Green Peppers',
+        value: ["Gp", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Spinach',
+        value: ["Si", {"1/1": '1'}]
+      }, 
+      new inquirer.Separator('EXTRA CHEESES'),
+      {
+        name: 'Feta',
+        value: ["Fe", {"1/1": '1'}]
+      }, 
+      {
+        name: 'Shredded Parmesan Asiago',
+        value: ["Cs", {"1/1": '1'}]
+      },
+      {
+        name: 'Chedder Cheese Blend',
+        value: ["E", {"1/1": '1'}]
+      },
+    ],
+    validate: maxToppingsValidation
+  },
   {
     type: "input",
     name: "firstNameAnswer",
@@ -109,7 +213,7 @@ const questions = [
     type: "input",
     name: "tipTotalAnswer",
     message: "How much do you want to tip??",
-  },
+  }
 ];
 
 
@@ -118,10 +222,7 @@ const questions = [
 
     // --- URI calls --- //
     
-    const findLocalStore = 'https://www.dominos.com/graphql'
-   
-    
-
+  const findLocalStore = 'https://www.dominos.com/graphql'
 
   program
   .command("ask")
@@ -130,6 +231,7 @@ const questions = [
     const answers = await inquirer.prompt(questions);
 
   const { 
+      pizzaToppingsAnswer,
       streetFullAnswer, 
       unitNumberAnswer, 
       cityAnswer, 
@@ -152,14 +254,12 @@ const questions = [
 
   let localStoreArr = {}
 
-  console.log(`Hello, ${firstNameAnswer} ${lastNameAnswer}!`);
+  console.log(`Welcome to Dominos, ${firstNameAnswer} ${lastNameAnswer}!!!`);
 
 
   // --- Find Store --- //
 
-
   // let delivery = []
-
 
   const storeLocaterHeader = {
     "headers": {
@@ -190,28 +290,6 @@ const questions = [
             }
         }
     }
-
-    // const testBody2 = {
-    //     query: `
-    //       query locateStores($input: StoreLocatorInput) {
-    //         locateStores(input: $input) {
-    //           Address {
-    //             City
-    //             PostalCode
-    //             Region
-    //             Street
-    //           }
-    //           Granularity
-    //         }
-    //       }
-    //     `,
-    //     variables: {
-    //       input: {
-    //         Street: "165 E 200 S",
-    //         PostalCode: "84111"
-    //       }
-    //     }
-    //   };
   
     // async function createStoreList(uri, payload, header) {
     //     try {
@@ -241,21 +319,10 @@ const questions = [
     console.log(delivery[0])
     
     const orderIDUri = 'https://order.dominos.com/power/validate-order'
-    const priceOrder = 'https://order.dominos.com/power/price-order'
+    const priceOrderUri = 'https://order.dominos.com/power/price-order'
     const authUri = `https://order.dominos.com/power/paymentGatewayService/tokenizeTemplate?storeID=${delivery[0]}&cardType=VISA&retryCount=0`
     const tokenIdUri = 'https://directpost-acquirer-us.aciondemand.com/dp-rest/1.0/acquire'
     const orderUri = 'https://order.dominos.com/power/place-order'
-
-
-
-    console.log('stop')
-
-    
-
-
-
-
-
 
 // --- Payload Variables --- //
 
@@ -284,6 +351,22 @@ const questions = [
     const storeID = delivery[0]
     const coupons = []
     const total = 28.77
+    
+
+    const cheeseAndCrustCode = [["X", {"1/1": '1'}], ["C", {"1/1": '1'}]]
+    const fullToppingList = cheeseAndCrustCode.concat(pizzaToppingsAnswer)
+
+    const toppings = fullToppingList.reduce((acc, curr) => {
+      let key = curr[0];
+      let value = curr[1];
+      acc[key] = value;
+      return acc;
+    }, {})
+
+    console.log('pizza pre convertion:', pizzaToppingsAnswer)
+    console.log('TOPPNGS:', toppings)
+
+
 
 // --- CARD INFO --- //
 
@@ -293,6 +376,40 @@ const questions = [
     const crv = crvAnswer
     const billingZip = billingZipAnswer
     const tipTotal = tipTotalAnswer
+
+
+// --- Topping Key --- //
+
+/*
+CRUST - "X": {"1/1": "1"},
+CHEESE - "C": {"1/1": "1"}
+PEPPERONI - P: {1/1: '1}
+HAM - H: {1/1: "1"}
+BEEF - B: {"1/1": "1"}
+SALAMI - Sa: {1/1: "1"}
+SAUSAGE - S: {1/1: "1"}
+CHICKEN - Du: {1/1: "1"}
+BACON - K: {1/1: "1"}
+PHILLY MEAT - Pm: {1/1: "1"}
+
+
+BUff HOT SAUCE - "Ht: {"1/1": "1"}"
+JALAPENOS - "J": {"1/1": "1"}"
+ONION - "O": {"1/1": "1"}"
+BANAANNA PEPPERS - "Z": {"1/1": "1"}"
+TOMATOS - "Td": {"1/1": "1"}"
+OLIVES - "R": {"1/1": "1"}"
+MUSHROOMS - "M": {"1/1": "1"}"
+PINAPPLE - "N": {"1/1": "1"}"
+SHREDED PROVOLONE - "Cp": {"1/1": "1"}"
+CHEDDER CHEESE BLEND - "E": {"1/1": "1"}"
+GREEN PEPPERS - "Gp": {"1/1": "1"}"
+SPINACH "Si": {"1/1": "1"}"
+FETA - "Fe": {"1/1": "1"}"
+SHREDED PARM ASIAGO - "Cs": {"1/1": "1"}"
+
+*/
+
 
 
 
@@ -353,17 +470,7 @@ const questions = [
                     "Qty": 1,
                     "ID": 1,
                     "isNew": true,
-                    "Options": {
-                        "X": {
-                            "1/1": "1"
-                        },
-                        "C": {
-                            "1/1": "1"
-                        },
-                        "P": {
-                            "1/1": "1.5"
-                        }
-                    }
+                    "Options": toppings
                 }
             ],
             "ServiceMethod": "Delivery",
@@ -378,44 +485,78 @@ const questions = [
         }
     }
 
-    const priceHeader = {
-        "headers": {
-          "accept": "application/json, text/javascript, */*; q=0.01",
-          "accept-language": "en-US,en;q=0.9",
-          "content-type": "application/json; charset=UTF-8",
-          "dpz-language": "en",
-          "dpz-market": "UNITED_STATES",
-          "dpz-source": "DSSPriceOrder",
-          "market": "UNITED_STATES",
-          "priority": "u=1, i",
-          "sec-ch-ua": "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": "\"macOS\"",
-          "sec-fetch-dest": "empty",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "same-origin",
-          "x-dpz-d": "30670069-d6af-4982-bfa7-480e422ca931"
-        }
-    }
+  //   const priceHeader = {
+  //       "headers": {
+  //         "accept": "application/json, text/javascript, */*; q=0.01",
+  //         "accept-language": "en-US,en;q=0.9",
+  //         "content-type": "application/json; charset=UTF-8",
+  //         "dpz-language": "en",
+  //         "dpz-market": "UNITED_STATES",
+  //         "dpz-source": "DSSPriceOrder",
+  //         "market": "UNITED_STATES",
+  //         "priority": "u=1, i",
+  //         "sec-ch-ua": "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
+  //         "sec-ch-ua-mobile": "?0",
+  //         "sec-ch-ua-platform": "\"macOS\"",
+  //         "sec-fetch-dest": "empty",
+  //         "sec-fetch-mode": "cors",
+  //         "sec-fetch-site": "same-origin",
+  //         "x-dpz-d": "30670069-d6af-4982-bfa7-480e422ca931"
+  //       }
+  //   }
 
 
-    // const userStreetAddressForQuery = '165 E 200 S'
-    // const userPostalCodeForQuery = '84111'
-
-    // const storeLocaterPayload = {
-    //     "query": "\n  query locateStores($input: StoreLocatorInput) {\n    locateStores(input: $input) {\n      Address {\n        City\n        PostalCode\n        Region\n        Street\n        StreetName\n        StreetNumber\n        UnitNumber\n        UnitType\n      }\n      Stores {\n        AddressDescription\n        AllowCarryoutOrders\n        AllowDeliveryOrders\n        AllowDuc\n        AllowPickupWindowOrders\n        ContactlessCarryout\n        ContactlessDelivery\n        HolidaysDescription\n        HoursDescription\n        IsDeliveryStore\n        IsNEONow\n        IsOnlineCapable\n        IsOnlineNow\n        IsOpen\n        IsSpanish\n        LanguageLocationInfo\n        LocationInfo\n        MaxDistance\n        MinDistance\n        Phone\n        ServiceHoursDescription {\n          Carryout\n          Delivery\n          DriveUpCarryout\n        }\n        ServiceIsOpen {\n          Carryout\n          Delivery\n          DriveUpCarryout\n        }\n        ServiceMethodEstimatedWaitMinutes {\n          Carryout {\n            Max\n            Min\n          }\n          Delivery {\n            Max\n            Min\n          }\n        }\n        StoreCoordinates {\n          StoreLatitude\n          StoreLongitude\n        }\n        StoreID\n      }\n    }\n  }\n",
-    //     "variables": {
-    //         "input": {
-    //             "AddressLine2": "",
-    //             "City": "SALT LAKE CITY",
-    //             "LocationName": "",
-    //             "Region": "UT",
-    //             "ServiceType": "DELIVERY",
-    //             "Street": userStreetAddressForQuery,
-    //             "PostalCode": userPostalCodeForQuery
-    //         }
-    //     }
-    // }
+  //   const pricePayload = {
+  //     "Order": {
+  //           "Address": {
+  //               "Street": street,
+  //               "StreetName": streetName,
+  //               "StreetNumber": streetNumber,
+  //               "UnitNumber": unitNumber,
+  //               "UnitType": "STE",
+  //               "City": city,
+  //               "Region": state,
+  //               "PostalCode": zipcode,
+  //               "Type": houseOrBuisness,
+  //           },
+  //           "Coupons": [],
+  //           "CustomerID": "",
+  //           "Email": email,
+  //           "Extension": "",
+  //           "FirstName": firstName,
+  //           "LastName": lastName,
+  //           "LanguageCode": "en",
+  //           "OrderChannel": "OLO",
+  //           "OrderID": orderID,
+  //           "OrderMethod": "Web",
+  //           "OrderTaker": null,
+  //           "Payments": [],
+  //           "Phone": phoneNumber,
+  //           "PhonePrefix": "",
+  //           "Products": [
+  //               {
+  //                   "Code": "14SCREEN",
+  //                   "Qty": 1,
+  //                   "ID": 1,
+  //                   "isNew": true,
+  //                   "Options": toppings
+  //               }
+  //           ],
+  //           "ServiceMethod": "Delivery",
+  //           "SourceOrganizationURI": "order.dominos.com",
+  //           "StoreID": "7507",
+  //           "Tags": {},
+  //           "Version": "1.0",
+  //           "NoCombine": true,
+  //           "Partners": {},
+  //           "HotspotsLite": false,
+  //           "OrderInfoCollection": [],
+  //           "metaData": {
+  //               "calculateNutrition": "true",
+  //               "orderFunnel": "cart"
+  //           }
+  //     }
+  // }
 
 
     // --- API Calls --- //
@@ -481,6 +622,75 @@ const questions = [
     let orderID = await getOrderID(orderIDUri,orderIDPayload, orderIDHeader)
     console.log(orderID)
 
+    const priceHeader = {
+      "headers": {
+        "accept": "application/json, text/javascript, */*; q=0.01",
+        "accept-language": "en-US,en;q=0.9",
+        "content-type": "application/json; charset=UTF-8",
+        "dpz-language": "en",
+        "dpz-market": "UNITED_STATES",
+        "dpz-source": "DSSPriceOrder",
+        "market": "UNITED_STATES",
+        "priority": "u=1, i",
+        "sec-ch-ua": "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"macOS\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "x-dpz-d": "30670069-d6af-4982-bfa7-480e422ca931"
+      }
+  }
+
+
+  const pricePayload = {
+    "Order": {
+          "Address": {
+              "Street": street,
+              "StreetName": streetName,
+              "City": city,
+              "Region": state,
+              "PostalCode": zipcode
+          },
+          "Coupons": [],
+          "CustomerID": "",
+          "Email": email,
+          "Extension": "",
+          "FirstName": firstName,
+          "LastName": lastName,
+          "LanguageCode": "en",
+          "OrderChannel": "OLO",
+          "OrderID": orderID,
+          "OrderMethod": "Web",
+          "OrderTaker": null,
+          "Payments": [],
+          "Phone": phoneNumber,
+          "PhonePrefix": "",
+          "Products": [
+              {
+                  "Code": "14SCREEN",
+                  "Qty": 1,
+                  "ID": 1,
+                  "isNew": true,
+                  "Options": toppings
+              }
+          ],
+          "ServiceMethod": "Delivery",
+          "SourceOrganizationURI": "order.dominos.com",
+          "StoreID": "7507",
+          "Tags": {},
+          "Version": "1.0",
+          "NoCombine": true,
+          "Partners": {},
+          "HotspotsLite": false,
+          "OrderInfoCollection": [],
+          "metaData": {
+              "calculateNutrition": "true",
+              "orderFunnel": "cart"
+          }
+        }
+    }
+
     const getAuthHeader = {
         "headers": {
           "accept": "application/json, text/javascript, */*; q=0.01",
@@ -503,6 +713,14 @@ const questions = [
         }
       }
 
+      let price = await getOrderPrice(priceOrderUri, pricePayload, priceHeader)
+      console.log('PRICE:', price)
+      console.log('stop')
+
+
+
+
+
     const tokenIdPayload = {
         "accountNumber": cardNumber,
         "cardExpiryDate": experationDate
@@ -510,6 +728,29 @@ const questions = [
 
     const authToken = await getAuthToken(authUri, getAuthHeader)
     console.log('Authorization:', authToken)
+
+    const pizzaHeaderData = {
+      "headers": {
+          "accept": "application/json, text/javascript, */*; q=0.01",
+          "accept-language": "en-US,en;q=0.9",
+          "content-type": "application/json; charset=UTF-8",
+          "dpz-language": "en",
+          "dpz-market": "UNITED_STATES",
+          "dpz-source": "DSSPlaceOrder",
+          "market": "UNITED_STATES",
+          "priority": "u=1, i",
+          "sec-ch-ua": "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": "\"macOS\"",
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          "x-dpz-captcha": "google-recaptcha-v3-enterprise-gnolo;token=03AFcWeA4SSsJIFboNokXs2b6xE3ksUiRJTvCOEj8yK-QGujH8FA5zciounpDeIELfVYSXGzABm5ULtElNjOTb-5DKGSW9U2pBcWoxNgKlrvud6Fsd7fRy7UE4CWUj1g5bs0h8qZ-32drT6lGEPW4SeNqAVWQb_oEtj9nt319Yyest1m3niMiKRXxPB1y4bt2Ieas7bG7qubQnkzAcXBNc-JhnZSgfyAXDn25FksZX7wR-ZTn3sDQS4_OJHIYxqjp-8NRwlRgqFtemNafgMglTKTreh5NPTpGVo8c1JwaMgyRZhpIZEYXS_qvIrGWWhOWpQTCr-Crz1fsbSj2_wxrakWi4nXV1uqigZHlGU7F_ZYuIQvTB6__8Sp_DEa5ugZei3bUynmQ5aYd5LPxI_Rwx-gqLmuhhy6nvKq2se35re_p52XiQafsvq4D06EQp8vABH9Cqh3qtg0AiPWP0RY9GfRYPFavOe-0TC3sF9RuISbJjwkvtmhScHldCNrWwIgGBu3wTH5yzjIx76UukTZLjYuVyuyUTWANyykU5-gqohNaa0hBonUCmwjC_jl-hsEtERcAEwjbQIvvak6V2T8UCXEyVOFKZd7ZyAtBZWI8hH7dcn6b0ri-Fw80j2LSwcdHlXroMN-qUDbDSz3-YeAO9Zqj9bb55tLDBLhl7vcNRMdUcviT8TZTATgWki89R7ZHm1BIABacpwZmnYrCsk8W14ghs_fnosHLb-KyqmdZSm_kWpZ7yt-oAO3ZX-9vANZPRJFwY3G_BbfvseHZU1JgmT_F4se60xiqKqcS7RYAF4bgf4xG2o91HF2gdzGmpJeV5eRMMPB3gBKLS2tf0uK31KRZ62Nga3RrpoF0tvCI5N4BLqpqjtLgTOttdAg_1GtBMYPz6Hb95mlo86d-1XJ8QuSpmqBylE_ZzkYr_3ugMyekUy0UR4nNHEp7mNGroVwrzoPS-kEOUouNUBJpjlMyfHXuflNVuoxHKgpOhmdsODOXrjwNVyDF89z5I2o7jM-QR2ijn69tKGl_GUgNuD19oHZcenMgqo69UlmVTCm5XenoTi6DZeBcWBHbXw_ZA4rD2ofgAX1X8rnJJyh3OctiKKHbpVjeiDNL3dkCnxFyRHRnVsHUFTbUa6XrMhMJWjMJ5cLn0zzi68dDfO6NqJrsFVtfyDt0pkqp4pelCox-cswghmrSq8tvw5ChPnZ9Q6druTh3PPgM7kzzSPmbGOjl0qjS0M4YeKAiAZy-NTZGa3C_aiFtkkAzmXDXpdtfuUF2t6aiqh80MD0-rDSrRDrfkTrTrFH2GePfPxGcnwiyu3Pk7O6Yoq2eSrWq3mr58qQZ4KAWGhuaIFjhxHCPabdKrZ7IjUToTevrAX7Wo2pZ-UCDxLydBPQGbJWyArAdP3z8F0AuHKjvFzvgtRUxlxTILflY5TPp3GdNPf8D9I6eb7WtPD0YY_lfwuQJFPAbFb_wn4DZtHCLVPlPhY-hRGTHKdz-b8jW_b7ZWe0USdauHttU2jGtMHODsVNQvJSW3MPGsAqiz11ZjO5uJBTHuqDkCU9w3lONSW0HaGJneU1-_QfzXxqc9pETqYVIQ2N2mkEXuX0kuI1_B_-DuHi192WBS0WYI1IS_CtvshDkJI99_2o9OIUo_siHI2xC3wHDjf7xlxwK_m-D07i7irpnzHALTmInL0ieAj-x_CGvm5bRv3HGOGuGWwLFOiKg;action=payment",
+          "x-dpz-d": "30670069-d6af-4982-bfa7-480e422ca931",
+          "authorization": authToken
+        }
+  }
+
 
     const tokenIdHeader = {
         "headers": {
@@ -525,31 +766,6 @@ const questions = [
           "sec-fetch-site": "cross-site"
         }
     }
-
-    const pizzaHeaderData = {
-        "headers": {
-            "accept": "application/json, text/javascript, */*; q=0.01",
-            "accept-language": "en-US,en;q=0.9",
-            "content-type": "application/json; charset=UTF-8",
-            "dpz-language": "en",
-            "dpz-market": "UNITED_STATES",
-            "dpz-source": "DSSPlaceOrder",
-            "market": "UNITED_STATES",
-            "priority": "u=1, i",
-            "sec-ch-ua": "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"macOS\"",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-            "x-dpz-captcha": "google-recaptcha-v3-enterprise-gnolo;token=03AFcWeA4SSsJIFboNokXs2b6xE3ksUiRJTvCOEj8yK-QGujH8FA5zciounpDeIELfVYSXGzABm5ULtElNjOTb-5DKGSW9U2pBcWoxNgKlrvud6Fsd7fRy7UE4CWUj1g5bs0h8qZ-32drT6lGEPW4SeNqAVWQb_oEtj9nt319Yyest1m3niMiKRXxPB1y4bt2Ieas7bG7qubQnkzAcXBNc-JhnZSgfyAXDn25FksZX7wR-ZTn3sDQS4_OJHIYxqjp-8NRwlRgqFtemNafgMglTKTreh5NPTpGVo8c1JwaMgyRZhpIZEYXS_qvIrGWWhOWpQTCr-Crz1fsbSj2_wxrakWi4nXV1uqigZHlGU7F_ZYuIQvTB6__8Sp_DEa5ugZei3bUynmQ5aYd5LPxI_Rwx-gqLmuhhy6nvKq2se35re_p52XiQafsvq4D06EQp8vABH9Cqh3qtg0AiPWP0RY9GfRYPFavOe-0TC3sF9RuISbJjwkvtmhScHldCNrWwIgGBu3wTH5yzjIx76UukTZLjYuVyuyUTWANyykU5-gqohNaa0hBonUCmwjC_jl-hsEtERcAEwjbQIvvak6V2T8UCXEyVOFKZd7ZyAtBZWI8hH7dcn6b0ri-Fw80j2LSwcdHlXroMN-qUDbDSz3-YeAO9Zqj9bb55tLDBLhl7vcNRMdUcviT8TZTATgWki89R7ZHm1BIABacpwZmnYrCsk8W14ghs_fnosHLb-KyqmdZSm_kWpZ7yt-oAO3ZX-9vANZPRJFwY3G_BbfvseHZU1JgmT_F4se60xiqKqcS7RYAF4bgf4xG2o91HF2gdzGmpJeV5eRMMPB3gBKLS2tf0uK31KRZ62Nga3RrpoF0tvCI5N4BLqpqjtLgTOttdAg_1GtBMYPz6Hb95mlo86d-1XJ8QuSpmqBylE_ZzkYr_3ugMyekUy0UR4nNHEp7mNGroVwrzoPS-kEOUouNUBJpjlMyfHXuflNVuoxHKgpOhmdsODOXrjwNVyDF89z5I2o7jM-QR2ijn69tKGl_GUgNuD19oHZcenMgqo69UlmVTCm5XenoTi6DZeBcWBHbXw_ZA4rD2ofgAX1X8rnJJyh3OctiKKHbpVjeiDNL3dkCnxFyRHRnVsHUFTbUa6XrMhMJWjMJ5cLn0zzi68dDfO6NqJrsFVtfyDt0pkqp4pelCox-cswghmrSq8tvw5ChPnZ9Q6druTh3PPgM7kzzSPmbGOjl0qjS0M4YeKAiAZy-NTZGa3C_aiFtkkAzmXDXpdtfuUF2t6aiqh80MD0-rDSrRDrfkTrTrFH2GePfPxGcnwiyu3Pk7O6Yoq2eSrWq3mr58qQZ4KAWGhuaIFjhxHCPabdKrZ7IjUToTevrAX7Wo2pZ-UCDxLydBPQGbJWyArAdP3z8F0AuHKjvFzvgtRUxlxTILflY5TPp3GdNPf8D9I6eb7WtPD0YY_lfwuQJFPAbFb_wn4DZtHCLVPlPhY-hRGTHKdz-b8jW_b7ZWe0USdauHttU2jGtMHODsVNQvJSW3MPGsAqiz11ZjO5uJBTHuqDkCU9w3lONSW0HaGJneU1-_QfzXxqc9pETqYVIQ2N2mkEXuX0kuI1_B_-DuHi192WBS0WYI1IS_CtvshDkJI99_2o9OIUo_siHI2xC3wHDjf7xlxwK_m-D07i7irpnzHALTmInL0ieAj-x_CGvm5bRv3HGOGuGWwLFOiKg;action=payment",
-            "x-dpz-d": "30670069-d6af-4982-bfa7-480e422ca931",
-            "authorization": authToken
-          }
-    }
-
-
-
 
     const TOKEN_ID = await getTokenId(tokenIdUri, tokenIdPayload, tokenIdHeader)
     console.log('TOKEN_ID:',TOKEN_ID)
@@ -584,7 +800,7 @@ const questions = [
             "Payments": [
                 {
                     "Type": "CreditCard",
-                    "Amount": 23.99,
+                    "Amount": price,
                     "Number": cardNumber,
                     "CardType": cardType,
                     "Expiration": experationDate,
@@ -609,17 +825,7 @@ const questions = [
                     "ID": 1,
                     "isNew": true,
                     "ShowBestPriceMessage": false,
-                    "Options": {
-                        "X": {
-                            "1/1": "1"
-                        },
-                        "C": {
-                            "1/1": "1"
-                        },
-                        "P": {
-                            "1/1": "1.5"
-                        }
-                    }
+                    "Options": toppings
                 }
             ],
             "ServiceMethod": "Delivery",
@@ -660,16 +866,13 @@ const questions = [
         }
     }
 
-
-    // console.log(finalPayload)
-    // console.log( await orderPizza(orderUri, finalPayload, pizzaHeaderData))
     const finalConformationRecipt = await orderPizza(orderUri, finalPayload, pizzaHeaderData)
+    // console.log(finalConformationRecipt)
     console.log(finalConformationRecipt.Order.StatusItems)
     console.log("Thanks For Your Order!")
 
     });
-
     program.parse(process.argv);
 
-  })()
-  
+   })()
+         

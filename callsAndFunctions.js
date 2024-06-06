@@ -2,20 +2,6 @@ import axios from "axios"
 
 let delivery = []
 
-async function getOrderID(uri, payload, header){
-    try {
-        const res = await axios.post(uri, payload , header)
-        const data = res.data.Order.OrderID
-        const authToken = res.data
-
-        return data
-
-    } catch(error){
-        console.log(error)
-    }
-}
-
-  
 async function createStoreList(uri, payload, header) {
     try {
     const res = axios.post(uri, payload, header)
@@ -39,6 +25,31 @@ async function createStoreList(uri, payload, header) {
     console.log(error)
     }
 }
+
+async function getOrderID(uri, payload, header) {
+    try {
+        const res = await axios.post(uri, payload , header)
+        const data = res.data.Order.OrderID
+        const authToken = res.data
+
+        return data
+
+    } catch(error){
+        console.log(error)
+    }
+}
+
+async function getOrderPrice(uri, payload, header) {
+    try {
+        const res = await axios.post(uri, payload , header)
+        const data = res.data
+        const price = res.data.Order.Amounts.Customer
+        return price
+    } catch(error) {
+        console.log(error)
+    }
+}
+  
 
 
 async function getAuthToken(uri, header){
@@ -77,9 +88,10 @@ async function orderPizza(uri, payload, header) {
 
 
 export {
-    getOrderID,
     delivery,
     createStoreList,
+    getOrderID,
+    getOrderPrice,
     getAuthToken,
     getTokenId,
     orderPizza
