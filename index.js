@@ -449,7 +449,19 @@ SHREDED PARM ASIAGO - "Cs": {"1/1": "1"}"
                 "Type": houseOrBuisness,
                 "OrganizationName": organization
             },
-            "Coupons": [],
+            "Coupons": [
+              {
+                "Code": "1126",
+                "Qty": 1,
+                // "ID": 2,
+                "IsBelowMinimumOrderAmount": false,
+                "isBelowMinimumCustomerAmount": false,
+                "IsBelowMinimumPaymentAmount": false,
+                // "Tags": {
+                //   "Hash": "1718476515510"
+                // }
+              }
+            ],
             "CustomerID": "",
             "Email": "",
             "Extension": "",
@@ -652,7 +664,19 @@ SHREDED PARM ASIAGO - "Cs": {"1/1": "1"}"
               "Region": state,
               "PostalCode": zipcode
           },
-          "Coupons": [],
+          "Coupons": [
+            {
+              "Code": "1126",
+              "Qty": 1,
+              // "ID": 2,
+              "IsBelowMinimumOrderAmount": false,
+              "isBelowMinimumCustomerAmount": false,
+              "IsBelowMinimumPaymentAmount": false,
+              "Tags": {
+                "Hash": "1718476515510"
+              }
+            }
+          ],
           "CustomerID": "",
           "Email": email,
           "Extension": "",
@@ -786,7 +810,19 @@ SHREDED PARM ASIAGO - "Cs": {"1/1": "1"}"
                 "Type": houseOrBuisness,
                 "OrganizationName": organization
             },
-            "Coupons": [],
+            "Coupons": [
+              {
+                "Code": "1126",
+                "Qty": 1,
+                // "ID": 2,
+                "IsBelowMinimumOrderAmount": false,
+                "isBelowMinimumCustomerAmount": false,
+                "IsBelowMinimumPaymentAmount": false,
+                // "Tags": {
+                //   "Hash": "1718476515510"
+                // }
+              }
+            ],
             "CustomerID": "",
             "Email": email,
             "Extension": "",
@@ -867,7 +903,7 @@ SHREDED PARM ASIAGO - "Cs": {"1/1": "1"}"
     }
 
     const finalConformationRecipt = await orderPizza(orderUri, finalPayload, pizzaHeaderData)
-    // console.log(finalConformationRecipt)
+    console.log(finalConformationRecipt)
     console.log(finalConformationRecipt.Order.StatusItems)
     console.log("Thanks For Your Order!")
 
@@ -876,3 +912,6 @@ SHREDED PARM ASIAGO - "Cs": {"1/1": "1"}"
 
    })()
          
+
+
+   
