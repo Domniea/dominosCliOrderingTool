@@ -32,41 +32,32 @@ npm install
 
 Start the CLI tool with:
 
-npm start
+ "npm start"
 
 
 
-🖥️ Demo
+## 🖥️ Demo (Screenshots)
 
-Here’s an example session of ordering a pizza:
+Here are some real screenshots from the app in action:  
 
-dominosApp on  main [!?] is 📦 v1.0.0 via  v22.14.0 
-❯ npm start
+### Selecting toppings in the CLI
+![Toppings selection](images/Screen-terminal.png)
 
-> order-a-dominos-pizza@1.0.0 start
-> node index.js ask
+---
 
-? Welcome to my Dominos Pizza Ordering CLI tool. 
-What type of toppings would you like on your pizza? 
- (Press <space> to select, <a> to toggle all, <i> to invert selection, and <enter> to proceed)
+### Full order entry flow
+![Full order example](images/Screen-full-order.png)
 
- PROTEINS
-❯◯ Pepperoni
- ◯ Ham
- ◯ Beef
- ◯ Salami
- ◯ Sausage
- ◯ Chicken
-(Move up and down to reveal more choices)
+---
 
-? What is your first name? john
-? What is your last name? does
-? What is your phone number? 8128128123
-? What is your email? johndoe@email.com
-? What is your street address? 123 street
-? What is your unit number? 42
-? What is your city? Salt Lake
-? What is your state? Ut
+### Final confirmation output
+![Order confirmation](images/Screen-conformation.png)
+
+---
+
+### Functions behind the scenes
+![Core functions](images/Screen-functions.png)
+
 
 
 
